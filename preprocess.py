@@ -2,6 +2,27 @@
 
 #Imported Modules
 import csv
+import sys
+
+def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        barLength   - Optional  : character length of bar (Int)
+    """
+    formatStr = "{0:." + str(decimals) + "f}"
+    percent = formatStr.format(100 * (iteration / float(total)))
+    filledLength = int(round(barLength * iteration / float(total)))
+    bar = '#'* filledLength + '-' * (barLength - filledLength)
+    sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percent, '%', suffix)),
+    if iteration == total:
+        sys.stdout.write('\n')
+    sys.stdout.flush()
 
 def readInData():
     global trainResults
@@ -40,14 +61,17 @@ def writePreproccessTrainingData():
 
         writer.writeheader()
         count = 0
-       
+        total = 130365
         for row in trainResults:
             if count == 0:
                 count += 1
+                continue
+            count += 1
             userIndex = [i for i, x in enumerate(userInfo) if x[0] == row[0]][0]
             #print(userIndex, row[0], userInfo[106340])
             writer.writerow({'user_id#merchant_id' : str(row[0])+"#"+str(row[1]), 'user_id' : row[0],'merchant_id' : row[1],
             'age_range' : userInfo[userIndex][1], 'gender' : userInfo[userIndex][2]})
+            printProgress(count, total)
 
 #initialize data arrays
 #global trainData = [];
