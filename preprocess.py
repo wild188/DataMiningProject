@@ -4,6 +4,10 @@
 import csv
 
 def readInData():
+    global trainResults
+    global userInfo
+
+    trainResults = []
     with open("datasets/train_label.csv", 'rb') as f:
         reader = csv.reader(f)
         counter = -1;
@@ -17,10 +21,12 @@ def readInData():
             counter += 1;
     print("Read in training data.");
 
-    #with open("datasets/user_info.csv", 'rb') as f:
-	#reader = csv.reader(f)
-	#userInfo = list(reader);
-    #print("Read in user information.");
+    userInfo = []
+    with open("datasets/user_info.csv", 'rb') as f:
+	    reader = csv.reader(f)
+	    userInfo = list(reader);
+    
+    print("Read in user information.");
 
     #with open("datasets/user_log.csv", 'rb') as f:
 	#reader = csv.reader(f)
@@ -29,21 +35,29 @@ def readInData():
 
 def writePreproccessTrainingData():
     with open('datasets/PreTrain.csv', 'w') as csvfile:
-        fieldnames = ['user_id#merchant_id', 'user_id', 'merchant_id' ]
+        fieldnames = ['user_id#merchant_id', 'user_id', 'merchant_id', 'age_range', 'gender']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
+        count = 0
+       
         for row in trainResults:
-            writer.writerow({'user_id#merchant_id' : str(row[0])+"#"+str(row[1]), 'user_id' : row[0], 'merchant_id' : row[1]})
+            if count == 0:
+                count += 1
+            userIndex = [i for i, x in enumerate(userInfo) if x[0] == row[0]][0]
+            #print(userIndex, row[0], userInfo[106340])
+            writer.writerow({'user_id#merchant_id' : str(row[0])+"#"+str(row[1]), 'user_id' : row[0],'merchant_id' : row[1],
+            'age_range' : userInfo[userIndex][1], 'gender' : userInfo[userIndex][2]})
 
 #initialize data arrays
-trainData = [];
-trainResults = [];
-userInfo = []
-purchaseInfo = []
+#global trainData = [];
+#global trainResults = [];
+#global userInfo = []
+#global purchaseInfo = []
 
 #read in data into memory
 readInData();
+#print(userInfo)
 writePreproccessTrainingData()
 print("Read in all Data.");
 
