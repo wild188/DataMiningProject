@@ -30,7 +30,7 @@ def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, bar
     sys.stdout.flush()
 
 def exampleEnsemble ():
-    iris = datasets.load_iris()
+	iris = datasets.load_iris()
 	X, y = iris.data[:, 1:3], iris.target
 
 	print(iris);
@@ -72,10 +72,18 @@ with open("datasets/user_info.csv", 'rb') as f:
 	reader = csv.reader(f)
 	userInfo = list(reader);
 print("Read in user information.");
-purchaseInfo = []
-total = 26258293
-counter = -1;
-with open("datasets/user_log.csv", 'rb') as f:
-	reader = csv.reader(f)
-	purchaseInfo = list(reader);
-print("Read in purchase information.")
+
+#userInfo = np.asarray(userInfo)
+#with open("datasets/userLog.npy", 'w') as f:
+#	np.save(f, userInfo);
+
+user_info2 = np.load("datasets/userLog.npy")
+print user_info2
+print user_info2[1][1]
+#purchaseInfo = []
+#total = 26258293
+#counter = -1;
+#with open("datasets/user_log.csv", 'rb') as f:
+#	reader = csv.reader(f)
+#	purchaseInfo = list(reader);
+#print("Read in purchase information.")
