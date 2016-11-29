@@ -30,10 +30,10 @@ def readInData():
     
     print("Read in user information.");
 
-    with open("datasets/user_log.csv", 'rb') as f:
-	    reader = csv.reader(f)
-	    purchaseInfo = list(reader);
-    print("Read in purchase information.")
+    #with open("datasets/user_log.csv", 'rb') as f:
+	#    reader = csv.reader(f)
+	#    purchaseInfo = list(reader);
+    #print("Read in purchase information.")
 
 #def cleanData():
     
@@ -49,14 +49,15 @@ def saveData():
     print("Saved training results")
 
     userInfo = np.asarray(userInfo)
+    print userInfo
     with open("datasets/userLog.npy", 'w') as f:
     	np.save(f, userInfo);
     print("Saved user information")
 
-    purchaseInfo = np.asarray(purchaseInfo)
-    with open("datasets/purchase_info.npy", 'w') as f:
-    	np.save(f, purchaseInfo);
-    print("Saved purchase information")
+    #purchaseInfo = np.asarray(purchaseInfo)
+    #with open("datasets/purchase_info.npy", 'w') as f:
+    #	np.save(f, purchaseInfo);
+    #print("Saved purchase information")
 
 #read in data into memory
 readInData();
