@@ -9,9 +9,9 @@ def readData():
     userInfo = np.load("datasets/userLog.npy")
     userInfo = np.delete(userInfo, (0), axis=0)
     print("Read in user information")
-    purchaseInfo = np.load("datasets/purchase_info.npy")
-    purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
-    print("Read in purchase information")
+    #purchaseInfo = np.load("datasets/purchase_info.npy")
+    #purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
+    #print("Read in purchase information")
 
 def updateUserInfo(transaction):
     global userInfo
