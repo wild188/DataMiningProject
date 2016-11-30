@@ -1,6 +1,6 @@
 import numpy as np
 from collections import namedtuple
-UserStruct = namedtuple("MyStruct", "userID age gender items cats merchants brands")
+UserStruct = namedtuple("MyStruct", "userID age gender items cats merchents brands")
 
 def readData():
     global userInfo
@@ -19,12 +19,29 @@ def updateUserInfo(transaction):
     print conUserInfo
     index = np.searchsorted(userInfo[:,0], transaction[0])
     #adding item_id to list
-    conUserInfo[index].items = np.append(conUserInfo[index].items, transaction[1])
+    try:
+        conUserInfo[index][3] = np.append(conUserInfo[index][3], transaction[1])
+    except IndexError:
+        conUserInfo[index] = np.append(conUserInfo[index],[transaction[1]])
+    
     #adding category_id to list
-    conUserInfo[index].cats = np.append(conUserInfo[index].cats,transaction[2])
+    try:
+        conUserInfo[index][4] = np.append(conUserInfo[index][2],transaction[2])
+    except IndexError:
+        conUserInfo[index] = np.append(conUserInfo[index], [transaction[2]])
+
     #add merchant_id to list
-    conUserInfo[index].merchants = np.append(conUserInfo[index].merchants, transaction[3])
+    try:
+        conUserInfo[index][5] = np.append(conUserInfo[index][3], transaction[3])
+    except IndexError:
+        conUserInfo[index].append([transaction[3]])
+
     #add action to list
+    try:
+        conUserInfo[index][6][transaction[4]] += 1
+    except IndexError:
+        conUserInfo[index] = np.append(conUserInfo[index], [0, 0, 0, 0])
+        conUserInfo[index][6][transaction[4]] += 1
 
 def updateMerchantInfo(transaction):
     global conMerchantInfo
@@ -54,7 +71,7 @@ def saveResults():
 
 userInfo = np.array([])
 purchaseInfo = np.array([])
-conUserInfo = np.array(UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([])) * userInfo.size)
+conUserInfo = np.array([UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([[]]))])
 conMerchantInfo = np.array([])
 readData()
 
