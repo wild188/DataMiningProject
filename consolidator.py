@@ -62,6 +62,7 @@ userInfo = np.array(userInfo)
 userInfo.sort(axis=0)
 i = 0
 for row in userInfo:
+    print row
     conUserInfo[i].userID = row[0]
     conUserInfo[i].age = row[1]
     conUserInfo[i].gender = row[2]
