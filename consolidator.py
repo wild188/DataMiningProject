@@ -1,6 +1,27 @@
 import numpy as np
 from collections import namedtuple
+import sys
 UserStruct = namedtuple("MyStruct", "userID age gender items cats merchants brands")
+
+def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        barLength   - Optional  : character length of bar (Int)
+    """
+    formatStr = "{0:." + str(decimals) + "f}"
+    percent = formatStr.format(100 * (iteration / float(total)))
+    filledLength = int(round(barLength * iteration / float(total)))
+    bar = '#'* filledLength + '-' * (barLength - filledLength)
+    sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percent, '%', suffix)),
+    if iteration == total:
+        sys.stdout.write('\n')
+    sys.stdout.flush()
 
 def readData():
     global userInfo
@@ -9,14 +30,14 @@ def readData():
     userInfo = np.load("datasets/userLog.npy")
     userInfo = np.delete(userInfo, (0), axis=0)
     print("Read in user information")
-    #purchaseInfo = np.load("datasets/purchase_info.npy")
-    #purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
-    #print("Read in purchase information")
+    purchaseInfo = np.load("datasets/purchase_info.npy")
+    purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
+    print("Read in purchase information")
 
 def updateUserInfo(transaction):
     global userInfo
     global conUserInfo
-    print conUserInfo
+    print conUserInfo.size
     index = np.searchsorted(userInfo[:,0], transaction[0])
     #adding item_id to list
     conUserInfo[index][3] = np.append(conUserInfo[index][3], transaction[1])
@@ -77,10 +98,12 @@ userInfo.sort(axis=0)
 conUserInfo = np.array([([[0], [0], [0], [], [], [], []]) * 1000])
 #np.repeat(conUserInfo, userInfo.size, axis=0)
 i = 0
+total = 200000
 print userInfo.size
 for row in userInfo:
     #print row
-    np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
+    printProgress(i, total)
+    conUserInfo = np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
     #print conUserInfo
     #print conUserInfo[i][0]
     #conUserInfo[i][0][0] = row[0]
@@ -89,6 +112,7 @@ for row in userInfo:
     i += 1
 
 print conUserInfo.size
+print conUserInfo[1000]
 print i
 
 consolidate()
