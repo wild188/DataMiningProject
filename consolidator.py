@@ -19,11 +19,23 @@ def updateUserInfo(transaction):
     print conUserInfo
     index = np.searchsorted(userInfo[:,0], transaction[0])
     #adding item_id to list
-    conUserInfo[index].items = np.append(conUserInfo[index].items, transaction[1])
+    conUserInfo[index][3] = np.append(conUserInfo[index][3], transaction[1])
+
     #adding category_id to list
-    conUserInfo[index].cats = np.append(conUserInfo[index].cats,transaction[2])
+    conUserInfo[index][4] = np.append(conUserInfo[index][2],transaction[2])
+
     #add merchant_id to list
-    conUserInfo[index].merchants = np.append(conUserInfo[index].merchants, transaction[3])
+    conUserInfo[index][5] = np.append(conUserInfo[index][3], transaction[3])
+    
+    #add brand_id to list
+    conUserInfo[index][6] = np.append(conUserInfo[index][6], transaction[4])
+
+    #adding item_id to list
+    #conUserInfo[index].items = np.append(conUserInfo[index].items, transaction[1])
+    #adding category_id to list
+    #conUserInfo[index].cats = np.append(conUserInfo[index].cats,transaction[2])
+    #add merchant_id to list
+    #conUserInfo[index].merchants = np.append(conUserInfo[index].merchants, transaction[3])
     #add action to list
 
 def updateMerchantInfo(transaction):
@@ -37,7 +49,7 @@ def interpretTransaction(transaction):
 def consolidate():
     global userInfo
     global purchaseInfo
-    global consUserInfo
+    global conUserInfo
 
     
     for row in purchaseInfo:
@@ -54,21 +66,30 @@ def saveResults():
 
 userInfo = np.array([])
 purchaseInfo = np.array([])
-conUserInfo = np.array(UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([])) * userInfo.size)
+
+
+#conUserInfo = np.array([UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([]))], dtype=object)
 conMerchantInfo = np.array([])
 readData()
 
 userInfo = np.array(userInfo)
 userInfo.sort(axis=0)
+conUserInfo = np.array([([[0], [0], [0], [], [], [], []]) * 1000])
+#np.repeat(conUserInfo, userInfo.size, axis=0)
 i = 0
+print userInfo.size
 for row in userInfo:
-    print row
-    conUserInfo[i].userID = row[0]
-    conUserInfo[i].age = row[1]
-    conUserInfo[i].gender = row[2]
+    #print row
+    np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
+    #print conUserInfo
+    #print conUserInfo[i][0]
+    #conUserInfo[i][0][0] = row[0]
+    #conUserInfo[i][0][0] = row[1]
+    #conUserInfo[i][0][0] = row[2]
     i += 1
 
-print conUserInfo
+print conUserInfo.size
+print i
 
 consolidate()
 saveResults()
