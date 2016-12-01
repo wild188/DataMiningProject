@@ -41,7 +41,7 @@ def updateUserInfo(transaction):
     global conUserInfo
     print "Con user len: ", len(conUserInfo)
     index = np.searchsorted(userInfo[:,0], transaction[0])
-    print "Found user: ", transaction[0], " at index: ", index
+    print "Found user: ", transaction[0],"=", conUserInfo[index][0][0], " at index: ", index
 
     transaction = np.array(transaction, dtype='i8')
 
@@ -52,7 +52,7 @@ def updateUserInfo(transaction):
         #print conUserInfo[index]
         conUserInfo[index] = [conUserInfo[index], [], [], [], []]
         conUserInfo[index][1] = conUserInfo[index][1] + [transaction[1]]
-        print "Balls", conUserInfo[index]
+        #print "Balls", conUserInfo[index]
 
     #adding category_id to list
     try:
@@ -132,7 +132,7 @@ print userInfo[0]
 
 userInfo = sorted(userInfo, key=itemgetter(0))
 
-conUserInfo = [[[-1]]] * len(userInfo)
+conUserInfo = []#[[[-1]]] * 200 # len(userInfo)
 #np.repeat(conUserInfo, userInfo.size, axis=0)
 3
 #userInfo = userInfo['userid']
@@ -144,21 +144,40 @@ print 100000, userInfo[100000][0]
 print len(userInfo)
 while i in range(len(userInfo)):
     #print i, userInfo[i]
-    #print userInfo[i][1]
+    #print "Original: ", i, userInfo[i]
     #printProgress(i, total)
     #conUserInfo = np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
     #print conUserInfo
     #print conUserInfo[i][0]
-    conUserInfo[i][0] = [userInfo[i][0], userInfo[i][1], userInfo[i][2]]
+
+    conUserInfo.append([])
+    conUserInfo[i].append(userInfo[i])
+    conUserInfo[i].append([])
+    conUserInfo[i].append([])
+    conUserInfo[i].append([])
+    conUserInfo[i].append([])
+
+    
+    i += 1
+    #conUserInfo[i][0] = [userInfo[i][0], userInfo[i][1], userInfo[i][2]]
+    #print "Copied: ", i, conUserInfo[i]
     printProgress(i, total)
     #conUserInfo[i][0][0] = row[0]
     #conUserInfo[i][0][0] = row[1]
     #conUserInfo[i][0][0] = row[2]
-    i += 1
+    #try:
+     #   print (i-1), conUserInfo[i-1]
+      #  i += 1
+    #except IndexError:
+     #   print "Balls"
+      #  i += 1
+        
+#print conUserInfo
 
 userInfo = np.array(userInfo)
+print userInfo
 print len(conUserInfo)
-print conUserInfo[100]
+print conUserInfo[90]
 print i
 
 i = 0
@@ -166,5 +185,7 @@ for i in range(100):
     print conUserInfo[i+10]
     i +=1
 
-#consolidate()
+consolidate()
+conUserInfo = np.array(conUserInfo)
+print conUserInfo
 #saveResults()
