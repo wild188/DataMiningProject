@@ -1,6 +1,8 @@
 import numpy as np
 from collections import namedtuple
 import sys
+from operator import itemgetter
+
 UserStruct = namedtuple("MyStruct", "userID age gender items cats merchants brands")
 
 def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
@@ -37,20 +39,41 @@ def readData():
 def updateUserInfo(transaction):
     global userInfo
     global conUserInfo
-    print conUserInfo.size
+    print "Con user len: ", len(conUserInfo)
     index = np.searchsorted(userInfo[:,0], transaction[0])
+    print "Found user: ", transaction[0], " at index: ", index
+
+    transaction = np.array(transaction, dtype='i8')
+
     #adding item_id to list
-    conUserInfo[index][3] = np.append(conUserInfo[index][3], transaction[1])
+    try:
+        conUserInfo[index][1].append(transaction[1])
+    except IndexError:
+        #print conUserInfo[index]
+        conUserInfo[index] = [conUserInfo[index], [], [], [], []]
+        conUserInfo[index][1] = conUserInfo[index][1] + [transaction[1]]
+        print "Balls", conUserInfo[index]
 
     #adding category_id to list
-    conUserInfo[index][4] = np.append(conUserInfo[index][2],transaction[2])
+    try:
+        conUserInfo[index][2] = conUserInfo[index][2] + [transaction[2]]
+    except IndexError:
+        conUserInfo[index].append([transaction[2]])
+        #print conUserInfo[index]
 
     #add merchant_id to list
-    conUserInfo[index][5] = np.append(conUserInfo[index][3], transaction[3])
-    
-    #add brand_id to list
-    conUserInfo[index][6] = np.append(conUserInfo[index][6], transaction[4])
+    try:
+        conUserInfo[index][3] = conUserInfo[index][3] + [transaction[3]]
+    except IndexError:
+        conUserInfo[index].append([transaction[3]])
 
+    #add brand_id to list
+    try:
+        conUserInfo[index][4].append(transaction[4])
+    except IndexError:
+        conUserInfo[index].append([transaction[3]])
+
+    print conUserInfo[index]
     #adding item_id to list
     #conUserInfo[index].items = np.append(conUserInfo[index].items, transaction[1])
     #adding category_id to list
@@ -92,28 +115,56 @@ purchaseInfo = np.array([])
 #conUserInfo = np.array([UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([]))], dtype=object)
 conMerchantInfo = np.array([])
 readData()
+print userInfo
+userInfo = np.asarray(userInfo, dtype='i8')
+#userInfo = userInfo.ravel().view([('userid','i4'),('age','i4'),('gender', 'i4'),]) #.astype([('userid','i4'),('age','i4'),('gender', 'i4'),])
+sorted(userInfo, key=itemgetter(0))
+print userInfo
+print userInfo[1]
+userInfo = userInfo.tolist()
+print userInfo[0]
 
-userInfo = np.array(userInfo)
-userInfo.sort(axis=0)
-conUserInfo = np.array([([[0], [0], [0], [], [], [], []]) * 1000])
+#billy = np.array([])
+#billy = np.hstack((userInfo[:1], userInfo[1:2], userInfo[2:]))
+#print billy
+
+#userInfo.sort(axis=0)#, order= 'userid')
+
+userInfo = sorted(userInfo, key=itemgetter(0))
+
+conUserInfo = [[[-1]]] * len(userInfo)
 #np.repeat(conUserInfo, userInfo.size, axis=0)
+3
+#userInfo = userInfo['userid']
+#print userInfo
 i = 0
-total = 200000
-print userInfo.size
-for row in userInfo:
-    #print row
-    printProgress(i, total)
-    conUserInfo = np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
+total = len(userInfo)
+print 100000, userInfo[100000][0]
+#print userInfo['userid']
+print len(userInfo)
+while i in range(len(userInfo)):
+    #print i, userInfo[i]
+    #print userInfo[i][1]
+    #printProgress(i, total)
+    #conUserInfo = np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
     #print conUserInfo
     #print conUserInfo[i][0]
+    conUserInfo[i][0] = [userInfo[i][0], userInfo[i][1], userInfo[i][2]]
+    printProgress(i, total)
     #conUserInfo[i][0][0] = row[0]
     #conUserInfo[i][0][0] = row[1]
     #conUserInfo[i][0][0] = row[2]
     i += 1
 
-print conUserInfo.size
-print conUserInfo[1000]
+userInfo = np.array(userInfo)
+print len(conUserInfo)
+print conUserInfo[100]
 print i
 
-consolidate()
-saveResults()
+i = 0
+for i in range(100):
+    print conUserInfo[i+10]
+    i +=1
+
+#consolidate()
+#saveResults()
