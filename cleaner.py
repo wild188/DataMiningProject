@@ -3,6 +3,27 @@
 #Imported Modules
 import csv
 import numpy as np
+import sys
+
+def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        barLength   - Optional  : character length of bar (Int)
+    """
+    formatStr = "{0:." + str(decimals) + "f}"
+    percent = formatStr.format(100 * (iteration / float(total)))
+    filledLength = int(round(barLength * iteration / float(total)))
+    bar = '#'* filledLength + '-' * (barLength - filledLength)
+    sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percent, '%', suffix)),
+    if iteration == total:
+        sys.stdout.write('\n')
+    sys.stdout.flush()
 
 def readInData():
     global trainResults
@@ -37,6 +58,22 @@ def readInData():
 
 #def cleanData():
     
+def processUserData():
+    global userInfo
+    global emptyUserInfoTable
+    emptyUserInfoTable = []
+    total = len(userInfo)
+    i = 0
+    while i in range(len(userInfo)):
+        emptyUserInfoTable.append([])
+        emptyUserInfoTable[i].append(userInfo[i])
+        emptyUserInfoTable[i].append([])
+        emptyUserInfoTable[i].append([])
+        emptyUserInfoTable[i].append([])
+        emptyUserInfoTable[i].append([])
+        i += 1
+        if (i % 1000) == 0:
+            printProgress(i, total, "Making empty user data table")
 
 def saveData():
     global trainResults
@@ -54,12 +91,17 @@ def saveData():
     	np.save(f, userInfo);
     print("Saved user information")
 
+    emptyUserInfoTable = np.array(emptyUserInfoTable)
+    with open("datasets/UserInfo2.npy", 'w') as f:
+        np.save(f, emptyUserInfoTable);
+        print("Saved user information")
     #purchaseInfo = np.asarray(purchaseInfo)
     #with open("datasets/purchase_info.npy", 'w') as f:
     #	np.save(f, purchaseInfo);
     #print("Saved purchase information")
 
 #read in data into memory
-readInData();
+readInData()
+processUserData()
 saveData()
 print("Cleaning complete");
