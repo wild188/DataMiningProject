@@ -29,6 +29,7 @@ def readInData():
     global trainResults
     global userInfo
     global purchaseInfo
+    global testData
 
     trainResults = []
     with open("datasets/train_label.csv", 'rb') as f:
@@ -43,6 +44,18 @@ def readInData():
             trainResults.append(toAdd);
             counter += 1;
     print("Read in training data.");
+
+    with open("datasets/test_label.csv", 'rb') as f:
+        reader = csv.reader(f)
+        counter = -1;
+        for row in reader:
+            if(counter < 0):
+                counter += 1;
+                continue;
+            toAdd = row[0].split('#');
+            testData.append(toAdd);
+            counter += 1;
+    print("Read in testing data.");
 
     userInfo = []
     with open("datasets/user_info.csv", 'rb') as f:
@@ -79,17 +92,23 @@ def saveData():
     global trainResults
     global userInfo
     global purchaseInfo
+    global testData
 
     trainResults = np.asarray(trainResults)
     with open("datasets/train_results.npy", 'w') as f:
     	np.save(f, trainResults);
-    print("Saved training results")
+        print("Saved training results")
+
+    testData = np.array(testData)
+    with open("datasets/test_data.npy", 'w') as f:
+    	np.save(f, testData);
+        print("Saved testData")
 
     userInfo = np.asarray(userInfo)
     print userInfo
     with open("datasets/userLog.npy", 'w') as f:
     	np.save(f, userInfo);
-    print("Saved user information")
+        print("Saved user information")
 
     emptyUserInfoTable = np.array(emptyUserInfoTable)
     with open("datasets/UserInfo2.npy", 'w') as f:
