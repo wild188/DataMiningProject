@@ -227,9 +227,9 @@ for i in range(100):
     print conUserInfo[i+10]
     i +=1
 conUserInfo = np.array(conUserInfo)
-with open("datasets/UserInfo2.npy", 'w') as f:
-    np.save(f, conUserInfo);
-    print("Saved user information")
+#with open("datasets/UserInfo2.npy", 'w') as f:
+#    np.save(f, conUserInfo);
+#    print("Saved user information")
 
 conUserInfo = conUserInfo.tolist()
 userLookup = userInfo[:,0]
