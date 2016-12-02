@@ -2,12 +2,13 @@ import numpy as np
 from collections import namedtuple
 import sys
 from operator import itemgetter
+import bisect
 
 UserStruct = namedtuple("MyStruct", "userID age gender items cats merchants brands")
 
 def findex(a, x):
     'Locate the leftmost value exactly equal to x'
-    i = bisect_left(a, x)
+    i = bisect.bisect_left(a, x)
     if i != len(a) and a[i] == x:
         return i
     return -1
@@ -58,7 +59,8 @@ def updateUserInfo(transaction):
     #print "Found user: ", transaction[0],"=", conUserInfo[index][0][0], " at index: ", index
 
     transaction = np.array(transaction, dtype='i8')
-
+    print "At index: ", index, "We found ", userInfo[index], " = ", transaction[0], " and wrote to ", consUserInfo[index]
+    print transaction
     #adding item_id to list
     addIfMissing(conUserInfo[index][1], transaction[1])
 #    try:
@@ -91,14 +93,14 @@ def updateUserInfo(transaction):
    # except IndexError:
     #    conUserInfo[index].append([transaction[4]])
 #
-    print conUserInfo[index]
+    #print conUserInfo[index]
 
 def updateMerchantInfo(transaction):
     global conMerchantInfo
     global merchantLookup
     transaction = np.array(transaction, dtype='i8')
 
-    index = findex(conMerchantInfo[:,0], transaction[3])
+    index = findex(merchantLookup, transaction[3])
     if index < 0:
         conMerchantInfo.append([])
         index = len(conMerchantInfo) - 1
@@ -116,6 +118,8 @@ def updateMerchantInfo(transaction):
     addIfMissing(conMerchantInfo[index][3], transaction[3])
     addIfMissing(conMerchantInfo[index][4], transaction[4])       
 
+    merchantLookup = sorted(merchantLookup)
+    conMerchantInfo = sorted(conMerchantInfo, key=itemgetter(0))
 
 def interpretTransaction(transaction):
     updateUserInfo(transaction)
@@ -153,7 +157,7 @@ purchaseInfo = np.array([])
 merchantLookup = []
 
 #conUserInfo = np.array([UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([]))], dtype=object)
-conMerchantInfo = np.array([])
+conMerchantInfo = []
 readData()
 print userInfo
 userInfo = np.asarray(userInfo, dtype='i8')
@@ -171,12 +175,13 @@ print userInfo[0]
 #userInfo.sort(axis=0)#, order= 'userid')
 
 userInfo = sorted(userInfo, key=itemgetter(0))
-
+print findex(userInfo, userInfo[100])
 conUserInfo = []
 i = 0
 total = len(userInfo)
 print 100000, userInfo[100000][0]
 print len(userInfo)
+print userInfo[12062]
 while i in range(len(userInfo)):
     conUserInfo.append([])
     conUserInfo[i].append(userInfo[i])
@@ -185,7 +190,8 @@ while i in range(len(userInfo)):
     conUserInfo[i].append([])
     conUserInfo[i].append([])
     i += 1
-    printProgress(i, total, "Copying User Info")
+    if (i % 1000) == 0:
+        printProgress(i, total, "Copying User Info")
 
 userInfo = np.array(userInfo)
 print userInfo
@@ -197,6 +203,12 @@ i = 0
 for i in range(100):
     print conUserInfo[i+10]
     i +=1
+conUserInfo = np.array(conUserInfo)
+with open("datasets/UserInfo2.npy", 'w') as f:
+    np.save(f, conUserInfo);
+    print("Saved user information")
+    
+conUserInfo = conUserInfo.tolist()
 
 consolidate()
 conUserInfo = np.array(conUserInfo)
