@@ -51,10 +51,10 @@ def readInData():
     
     print("Read in user information.");
 
-    #with open("datasets/user_log.csv", 'rb') as f:
-	#    reader = csv.reader(f)
-	#    purchaseInfo = list(reader);
-    #print("Read in purchase information.")
+    with open("datasets/user_log.csv", 'rb') as f:
+	    reader = csv.reader(f)
+	    purchaseInfo = list(reader);
+    print("Read in purchase information.")
 
 #def cleanData():
     
@@ -73,7 +73,7 @@ def processUserData():
         emptyUserInfoTable[i].append([])
         i += 1
         if (i % 1000) == 0:
-            printProgress(i, total, "Making empty user data table")
+            printProgress(i, total, "User data table")
 
 def saveData():
     global trainResults
@@ -95,10 +95,10 @@ def saveData():
     with open("datasets/UserInfo2.npy", 'w') as f:
         np.save(f, emptyUserInfoTable);
         print("Saved user information")
-    #purchaseInfo = np.asarray(purchaseInfo)
-    #with open("datasets/purchase_info.npy", 'w') as f:
-    #	np.save(f, purchaseInfo);
-    #print("Saved purchase information")
+    purchaseInfo = np.asarray(purchaseInfo)
+    with open("datasets/purchase_info.npy", 'w') as f:
+    	np.save(f, purchaseInfo);
+    print("Saved purchase information")
 
 #read in data into memory
 readInData()
