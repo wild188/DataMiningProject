@@ -10,9 +10,7 @@ def findex(a, x):
     'Locate the leftmost value exactly equal to x'
     i = bisect.bisect_left(a, x)
     if i != len(a) and a[i] == x:
-        #print("\n\n\n FOUND!!! \n\n\n")
         return i
-    
     return -1
 
 def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
@@ -38,7 +36,6 @@ def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, bar
 def readData():
     global userInfo
     global purchaseInfo 
-    global conUserInfo
 
     userInfo = np.load("datasets/userLog.npy")
     userInfo = np.delete(userInfo, (0), axis=0)
@@ -46,8 +43,6 @@ def readData():
     purchaseInfo = np.load("datasets/purchase_info.npy")
     purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
     print("Read in purchase information")
-    conUserInfo = np.load("datasets/UserInfo2.npy")
-    print("Read in user information 2")
 
 def addIfMissing(array, value):
     try:
@@ -59,31 +54,13 @@ def addIfMissing(array, value):
 def updateUserInfo(transaction):
     global userInfo
     global conUserInfo
-    global userLookup
-    global errorNum
-    global transNum
-
     #print "Con user len: ", len(conUserInfo)
-    #index = np.searchsorted(userInfo[:,0], transaction[0])
-    transaction = np.array(transaction, dtype='i8')
-    index = findex(userLookup, transaction[0])
-    if index < 0:
-        print "At index: ", index, "We Did not find ", userInfo[index], " = ", transaction[0], " and wrote to ", conUserInfo[index]
-        print transaction
-        print "ERROR!!!"
-        errorNum += 1
-        print errorNum
-
-        f=open("error_log.txt", "a+")
-        f.write("Error updating for transaction# %d" %transNum)
-        f.close()
-        return
-
+    index = np.searchsorted(userInfo[:,0], transaction[0])
     #print "Found user: ", transaction[0],"=", conUserInfo[index][0][0], " at index: ", index
 
-    #transaction = np.array(transaction, dtype='i8')
-    #print "At index: ", index, "We found ", userInfo[index], " = ", transaction[0], " and wrote to ", conUserInfo[index]
-    #print transaction
+    transaction = np.array(transaction, dtype='i8')
+    print "At index: ", index, "We found ", userInfo[index], " = ", transaction[0], " and wrote to ", conUserInfo[index]
+    print transaction
     #adding item_id to list
     addIfMissing(conUserInfo[index][1], transaction[1])
 #    try:
@@ -152,15 +129,13 @@ def consolidate():
     global userInfo
     global purchaseInfo
     global conUserInfo
-    global transNum
 
     total = len(purchaseInfo)
-    transNum = 0
+    i = 0
     for row in purchaseInfo:
         interpretTransaction(row)
-        if (transNum % 1000) == 0:
-            printProgress(transNum, total, "Processing Transactions")
-        transNum += 1
+        printProgress(i, total, "Processing Transactions")
+        i += 1
 
 def saveResults():
     global conUserInfo
@@ -180,17 +155,9 @@ def saveResults():
 userInfo = np.array([])
 purchaseInfo = np.array([])
 merchantLookup = []
-transNum = 0
-errorNum = 0
+
 #conUserInfo = np.array([UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([]))], dtype=object)
 conMerchantInfo = []
-conUserInfo = []
-
-f=open("errpr_log.txt", "a+")
-f.write("Error updating for transaction# %d" %transNum)
-f.close()
-
-
 readData()
 print userInfo
 userInfo = np.asarray(userInfo, dtype='i8')
@@ -209,12 +176,22 @@ print userInfo[0]
 
 userInfo = sorted(userInfo, key=itemgetter(0))
 print findex(userInfo, userInfo[100])
-
+conUserInfo = []
 i = 0
 total = len(userInfo)
 print 100000, userInfo[100000][0]
 print len(userInfo)
 print userInfo[12062]
+while i in range(len(userInfo)):
+    conUserInfo.append([])
+    conUserInfo[i].append(userInfo[i])
+    conUserInfo[i].append([])
+    conUserInfo[i].append([])
+    conUserInfo[i].append([])
+    conUserInfo[i].append([])
+    i += 1
+    if (i % 1000) == 0:
+        printProgress(i, total, "Copying User Info")
 
 userInfo = np.array(userInfo)
 print userInfo
@@ -232,12 +209,8 @@ with open("datasets/UserInfo2.npy", 'w') as f:
     print("Saved user information")
 
 conUserInfo = conUserInfo.tolist()
-userLookup = userInfo[:,0]
-print userLookup
 
 consolidate()
 conUserInfo = np.array(conUserInfo)
 print conUserInfo
 saveResults()
-print "Saved results"
-print "Total errors: ", errorNum
