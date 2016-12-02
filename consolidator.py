@@ -5,6 +5,13 @@ from operator import itemgetter
 
 UserStruct = namedtuple("MyStruct", "userID age gender items cats merchants brands")
 
+def findex(a, x):
+    'Locate the leftmost value exactly equal to x'
+    i = bisect_left(a, x)
+    if i != len(a) and a[i] == x:
+        return i
+    return -1
+
 def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
     """
     Call in a loop to create terminal progress bar
@@ -36,55 +43,79 @@ def readData():
     purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
     print("Read in purchase information")
 
+def addIfMissing(array, value):
+    try:
+        array.index(value)
+    except ValueError:
+        array.append(value)
+
+
 def updateUserInfo(transaction):
     global userInfo
     global conUserInfo
-    print "Con user len: ", len(conUserInfo)
+    #print "Con user len: ", len(conUserInfo)
     index = np.searchsorted(userInfo[:,0], transaction[0])
-    print "Found user: ", transaction[0],"=", conUserInfo[index][0][0], " at index: ", index
+    #print "Found user: ", transaction[0],"=", conUserInfo[index][0][0], " at index: ", index
 
     transaction = np.array(transaction, dtype='i8')
 
     #adding item_id to list
-    try:
-        conUserInfo[index][1].append(transaction[1])
-    except IndexError:
+    addIfMissing(conUserInfo[index][1], transaction[1])
+#    try:
+#        conUserInfo[index][1].append(transaction[1])
+#    except IndexError:
         #print conUserInfo[index]
-        conUserInfo[index] = [conUserInfo[index], [], [], [], []]
-        conUserInfo[index][1] = conUserInfo[index][1] + [transaction[1]]
+#        conUserInfo[index] = [conUserInfo[index], [], [], [], []]
+#        conUserInfo[index][1] = conUserInfo[index][1] + [transaction[1]]
         #print "Balls", conUserInfo[index]
 
     #adding category_id to list
-    try:
-        conUserInfo[index][2] = conUserInfo[index][2] + [transaction[2]]
-    except IndexError:
-        conUserInfo[index].append([transaction[2]])
-        #print conUserInfo[index]
-
-    #add merchant_id to list
-    try:
-        conUserInfo[index][3] = conUserInfo[index][3] + [transaction[3]]
-    except IndexError:
-        conUserInfo[index].append([transaction[3]])
-
+    addIfMissing(conUserInfo[index][2], transaction[2])
+#    try:
+#        conUserInfo[index][2] = conUserInfo[index][2] + [transaction[2]]
+#    except IndexError:
+#        conUserInfo[index].append([transaction[2]])
+ #       #print conUserInfo[index]
+#
+ #   #add merchant_id to list
+    addIfMissing(conUserInfo[index][3], transaction[3])
+  #  try:
+   #     conUserInfo[index][3] = conUserInfo[index][3] + [transaction[3]]
+    #except IndexError:
+     #   conUserInfo[index].append([transaction[3]])
+#
     #add brand_id to list
-    try:
-        conUserInfo[index][4].append(transaction[4])
-    except IndexError:
-        conUserInfo[index].append([transaction[3]])
-
+    addIfMissing(conUserInfo[index][4], transaction[4])
+ #   try:
+  #      conUserInfo[index][4].append(transaction[4])
+   # except IndexError:
+    #    conUserInfo[index].append([transaction[4]])
+#
     print conUserInfo[index]
-    #adding item_id to list
-    #conUserInfo[index].items = np.append(conUserInfo[index].items, transaction[1])
-    #adding category_id to list
-    #conUserInfo[index].cats = np.append(conUserInfo[index].cats,transaction[2])
-    #add merchant_id to list
-    #conUserInfo[index].merchants = np.append(conUserInfo[index].merchants, transaction[3])
-    #add action to list
 
 def updateMerchantInfo(transaction):
     global conMerchantInfo
     global merchantLookup
+    transaction = np.array(transaction, dtype='i8')
+
+    index = findex(conMerchantInfo[:,0], transaction[3])
+    if index < 0:
+        conMerchantInfo.append([])
+        index = len(conMerchantInfo) - 1
+        merchantLookup.append(transaction[3])
+        conMerchantInfo[index].append([])
+        conMerchantInfo[index].append([])
+        conMerchantInfo[index].append([])
+        conMerchantInfo[index].append([])
+        conMerchantInfo[index].append([])
+        conMerchantInfo[index].append([])
+        conMerchantInfo[index][0].append(transaction[3])
+
+    addIfMissing(conMerchantInfo[index][1], transaction[1])
+    addIfMissing(conMerchantInfo[index][2], transaction[2])
+    addIfMissing(conMerchantInfo[index][3], transaction[3])
+    addIfMissing(conMerchantInfo[index][4], transaction[4])       
+
 
 def interpretTransaction(transaction):
     updateUserInfo(transaction)
@@ -95,11 +126,20 @@ def consolidate():
     global purchaseInfo
     global conUserInfo
 
-    
+    total = len(purchaseInfo)
+    i = 0
     for row in purchaseInfo:
         interpretTransaction(row)
+        printProgress(i, total, "Processing Transactions")
+        i += 1
 
 def saveResults():
+    global conUserInfo
+    global conMerchantInfo
+    print("Saving results")
+    conUserInfo = np.array(conUserInfo)
+    conMerchantInfo = np.array(conMerchantInfo)
+
     with open("datasets/consUserInfo.npy", 'w') as f:
     	np.save(f, conUserInfo);
     print("Saved user information")
@@ -110,7 +150,7 @@ def saveResults():
 
 userInfo = np.array([])
 purchaseInfo = np.array([])
-
+merchantLookup = []
 
 #conUserInfo = np.array([UserStruct(0, 0, 0, np.array([]), np.array([]), np.array([]), np.array([]))], dtype=object)
 conMerchantInfo = np.array([])
@@ -132,47 +172,20 @@ print userInfo[0]
 
 userInfo = sorted(userInfo, key=itemgetter(0))
 
-conUserInfo = []#[[[-1]]] * 200 # len(userInfo)
-#np.repeat(conUserInfo, userInfo.size, axis=0)
-3
-#userInfo = userInfo['userid']
-#print userInfo
+conUserInfo = []
 i = 0
 total = len(userInfo)
 print 100000, userInfo[100000][0]
-#print userInfo['userid']
 print len(userInfo)
 while i in range(len(userInfo)):
-    #print i, userInfo[i]
-    #print "Original: ", i, userInfo[i]
-    #printProgress(i, total)
-    #conUserInfo = np.append(conUserInfo, [[row[0]], [row[1]], [row[2]], [], [], [], []])
-    #print conUserInfo
-    #print conUserInfo[i][0]
-
     conUserInfo.append([])
     conUserInfo[i].append(userInfo[i])
     conUserInfo[i].append([])
     conUserInfo[i].append([])
     conUserInfo[i].append([])
     conUserInfo[i].append([])
-
-    
     i += 1
-    #conUserInfo[i][0] = [userInfo[i][0], userInfo[i][1], userInfo[i][2]]
-    #print "Copied: ", i, conUserInfo[i]
-    printProgress(i, total)
-    #conUserInfo[i][0][0] = row[0]
-    #conUserInfo[i][0][0] = row[1]
-    #conUserInfo[i][0][0] = row[2]
-    #try:
-     #   print (i-1), conUserInfo[i-1]
-      #  i += 1
-    #except IndexError:
-     #   print "Balls"
-      #  i += 1
-        
-#print conUserInfo
+    printProgress(i, total, "Copying User Info")
 
 userInfo = np.array(userInfo)
 print userInfo
@@ -188,4 +201,4 @@ for i in range(100):
 consolidate()
 conUserInfo = np.array(conUserInfo)
 print conUserInfo
-#saveResults()
+saveResults()

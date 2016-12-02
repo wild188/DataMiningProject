@@ -48,6 +48,19 @@ def exampleEnsemble ():
 		scores = cross_val_score(clf, X, y, cv=5, scoring='accuracy')
 		print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))	
 
+def addIfMissing(array, value):
+    try:
+        array.index(value)
+    except ValueError:
+        array.append(value)
+
+
+a = []
+addIfMissing(a, 1)
+addIfMissing(a, 4)
+print a
+addIfMissing(a, 1)
+print a
 
 trainData = [];
 trainResults = [];
