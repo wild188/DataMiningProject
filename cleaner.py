@@ -30,6 +30,7 @@ def readInData():
     global userInfo
     global purchaseInfo
     global testData
+    testData = []
 
     trainResults = []
     with open("datasets/train_label.csv", 'rb') as f:
@@ -93,6 +94,7 @@ def saveData():
     global userInfo
     global purchaseInfo
     global testData
+    global emptyUserInfoTable
 
     trainResults = np.asarray(trainResults)
     with open("datasets/train_results.npy", 'w') as f:
@@ -114,10 +116,11 @@ def saveData():
     with open("datasets/UserInfo2.npy", 'w') as f:
         np.save(f, emptyUserInfoTable);
         print("Saved user information")
+
     purchaseInfo = np.asarray(purchaseInfo)
     with open("datasets/purchase_info.npy", 'w') as f:
     	np.save(f, purchaseInfo);
-    print("Saved purchase information")
+        print("Saved purchase information")
 
 #read in data into memory
 readInData()
