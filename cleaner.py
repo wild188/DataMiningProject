@@ -56,7 +56,7 @@ def readInData():
             toAdd = row[0].split('#');
             testData.append(toAdd);
             counter += 1;
-    print("Read in testing data.");
+        print("Read in testing data.");
 
     userInfo = []
     with open("datasets/user_info.csv", 'rb') as f:
@@ -97,12 +97,12 @@ def saveData():
     global emptyUserInfoTable
 
     trainResults = np.asarray(trainResults)
-    with open("datasets/train_results.npy", 'w') as f:
+    with open("datasets/train_targets.npy", 'w') as f:
     	np.save(f, trainResults);
         print("Saved training results")
 
     testData = np.array(testData)
-    with open("datasets/test_data.npy", 'w') as f:
+    with open("datasets/test_targets.npy", 'w') as f:
     	np.save(f, testData);
         print("Saved testData")
 

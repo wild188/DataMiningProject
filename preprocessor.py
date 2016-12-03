@@ -65,7 +65,7 @@ def readData():
     trainingTargets = np.load("datasets/train_results.npy")
     #userInfo = np.delete(userInfo, (0), axis=0)
     print "Read in training information"
-    testingTargets = np.load("datasets/purchase_info.npy")
+    testingTargets = np.load("datasets/test_data.npy")
     #purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
     print "Read in testing information"
     userInfo = np.load("datasets/consUserInfo.npy")
@@ -76,12 +76,16 @@ def readData():
 def genUserLookup():
     global userInfo
     global userLookup
-    userLookup = userInfo[:, 0]
+    userLookup = map(itemgetter(0), userInfo)
+    #print userLookup
+    userLookup = map(itemgetter(0), userLookup)
+    #print userLookup
 
 def genMerchantLookup():
     global merchantInfo
     global merchantLookup
-    merchantLookup = merchantInfo[:, 0]
+    merchantLookup = map(itemgetter(0), merchantInfo)
+    merchantLookup = map(itemgetter(0), merchantLookup)
 
 def tupleGen(user, merchant):
     global userInfo
@@ -94,7 +98,9 @@ def tupleGen(user, merchant):
     userIndex = findex(userLookup, user)
     merchantIndex = findex(merchantLookup, merchant)
     if (userIndex < 0 or merchantIndex < 0):
+
         print "ERROR: user or merchant not found"
+        print "User: ", user, "Merchant: ", merchant
         return row
     
     itemScore = simScore(userInfo[userIndex][1], merchantInfo[merchantIndex][1])
@@ -102,10 +108,13 @@ def tupleGen(user, merchant):
     merchantScore = lsearch(userInfo[userIndex][3], merchant)
     if merchantScore == -1:
         merchantScore = 0
+    else:
+        merchantScore = 1
+
     brandScore = simScore(userInfo[userIndex][4], merchantInfo[merchantIndex][4])
 
-    row.append(userInfo[0][1]) #age
-    row.append(userInfo[0][2]) #gender
+    row.append(userInfo[userIndex][0][1]) #age
+    row.append(userInfo[userIndex][0][2]) #gender
     row.append(itemScore)
     row.append(catScore)
     row.append(merchantScore)
@@ -117,24 +126,34 @@ def genTrainingMatrix():
     global trainingTargets
     global trainingData
 
+    i = 0
     trainingData = []
-    total = len(trainingData)
+    total = len(trainingTargets)
     for i in range(total):
-        trainingData.append(tupleGen(trainingTargets[0], trainingTargets[1]))
-        trainingData[i].append(trainingTargets[2])
+        trainingData.append(tupleGen(trainingTargets[i][0], trainingTargets[i][1]))
+        trainingData[i].append(trainingTargets[i][2])
         if (i % 1000):
-            printProgress(i, total, "Generating training data")
+            #print trainingData[i]
+            printProgress(i, total, "Training data")
+        i += 1
         
 def genTestingMatrix():
     global testingTargets
     global testingData
 
+    i = 0
     testingData = []
     total = len(testingTargets)
     for i in range(total):
-        testingData.append(tupleGen(testingTargets[0], testingTargets[1]))
+        toAdd = tupleGen(testingTargets[i][0], testingTargets[i][1])
+        if len(toAdd) < 2:
+            print "Testing matrix failed"
+            return
+        testingData.append(toAdd)
         if (i % 1000):
-            printProgress(i, total, "Generating testing data")
+            #print testingData[i]
+            printProgress(i, total, "Testing data")
+        i += 1
 
 #userLookup = []
 #userInfo = []
@@ -143,12 +162,41 @@ def genTestingMatrix():
 #testingTargets = []
 #traingingAnswers = []
 readData()
+print "Read in Data"
+userInfo = userInfo.tolist()
+
+def saveData():
+    global trainingData
+    global testingData
+
+    trainingData = np.array(trainingData)
+    testingData = np.array(testingData)
+
+    with open("datasets/trainingData.npy", 'w') as f:
+    	np.save(f, trainingData);
+        print("Saved training data")
+    
+    with open("datasets/testingData.npy", 'w') as f:
+    	np.save(f, testingData);
+        print("Saved testing data")
+
+
+trainingTargets = np.array(trainingTargets, dtype='i8')
+print "Made training numbers"
+print trainingTargets
+#testingTargets = np.delete(testingTargets, (0), axis=0)
+testingTargets = np.array(testingTargets, dtype='i8')
+print "Made testing numbers"
+print testingTargets
+#trainingTargets = trainingTargets.tolist()
+#testingTargets = testingTargets.tolist()
+print "Numpy targest are now lists"
 genUserLookup()
 print "Made user lookup table"
+print np.array(userLookup)
 genMerchantLookup()
 print "Made merchantLookup"
-
-print "Read in Data"
+print np.array(merchantLookup)
 genTrainingMatrix()
 print "Generated training matrix"
 genTestingMatrix()
