@@ -17,7 +17,7 @@ def makeSubFile():
 
     f=open("datasets/mySubmit", "w+")
     for i in range(len(testingTargets)):
-        f.write("%d#%d, #d", testingTargets[i][0], testingTargets[i][1], results[i])
+        f.write("%s#%s, %s\n" %(testingTargets[i][0], testingTargets[i][1], results[i][1]))
         i+= 1
     f.close()
 
@@ -33,13 +33,15 @@ def prepareData():
     print testingData
 
     t = len(trainingData[0]) - 1
+    print range(t)
     trainingResults = map(itemgetter(t), trainingData)
     trainingResults = np.array(trainingResults)
     print trainingResults
 
-    trainingData = trainingData.tolist()
-    trainingData = trainingData[:, t-1]
+    #trainingData = trainingData.tolist()
+    trainingData = map(itemgetter(range(t)), trainingData)#trainingData[t:, 1]
     trainingData = np.array(trainingData)
+    print trainingData
 
 def testMod():
     global trainingData
@@ -52,6 +54,8 @@ def testMod():
     clf2 = RandomForestClassifier(random_state=1).fit(X_train, y_train)
     clf3 = GaussianNB().fit(X_train, y_train)
 
+    print X_train, X_test, y_train, y_test
+
     print clf1.score(X_test, y_test)
     print clf1.score(X_test, y_test)
     print clf1.score(X_test, y_test)
@@ -62,8 +66,29 @@ def testMod():
     	scores = cross_val_score(clf, trainingData, trainingResults, cv=5, scoring='accuracy')
     	print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
 
+def popResults():
+    global results
+    global trainingData
+    global testingData
+    global trainingResults
+
+    clf1 = LogisticRegression(random_state=1).fit(trainingData, trainingResults)
+    clf2 = RandomForestClassifier(random_state=1).fit(trainingData, trainingResults)
+    clf3 = GaussianNB().fit(trainingData, trainingResults)
+
+    eclf = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='hard')
+    print clf1.predict_proba(testingData)
+    results = clf1.predict_proba(testingData)
+    print clf1.predict(testingData)
+
+
 results= []
 prepareData()
 print "Prepared all data"
-testMod()
-print "Tested"
+#testMod()
+#print "Tested"
+
+popResults()
+print "Calculated results"
+makeSubFile()
+print "Done"
