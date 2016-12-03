@@ -50,10 +50,14 @@ def readData():
     print("Read in user information 2")
 
 def addIfMissing(array, value):
+    i = 0;
     try:
-        array.index(value)
+        i = array.index(value)
     except ValueError:
         array.append(value)
+        i = array.index(value)
+    return i
+
 
 
 def updateUserInfo(transaction):
