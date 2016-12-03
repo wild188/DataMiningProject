@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import VotingClassifier
+from operator import itemgetter
 import csv
 
 def makeSubFile():
@@ -48,17 +49,21 @@ def testMod():
     X_train, X_test, y_train, y_test = train_test_split(trainingData, trainingResults, test_size=0.4, random_state=0)
 
     clf1 = LogisticRegression(random_state=1).fit(X_train, y_train)
-	clf2 = RandomForestClassifier(random_state=1).fit(X_train, y_train)
-	clf3 = GaussianNB().fit(X_train, y_train)
+    clf2 = RandomForestClassifier(random_state=1).fit(X_train, y_train)
+    clf3 = GaussianNB().fit(X_train, y_train)
 
     print clf1.score(X_test, y_test)
     print clf1.score(X_test, y_test)
     print clf1.score(X_test, y_test)
 
-	eclf = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='hard')
+    eclf = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='hard')
 
-	for clf, label in zip([clf1, clf2, clf3, eclf], ['Logistic Regression', 'Random Forest', 'naive Bayes', 'Ensemble']):
-		scores = cross_val_score(clf, trainingData, trainingResults, cv=5, scoring='accuracy')
-		print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
+    for clf, label in zip([clf1, clf2, clf3, eclf], ['Logistic Regression', 'Random Forest', 'naive Bayes', 'Ensemble']):
+    	scores = cross_val_score(clf, trainingData, trainingResults, cv=5, scoring='accuracy')
+    	print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
 
 results= []
+prepareData()
+print "Prepared all data"
+testMod()
+print "Tested"
