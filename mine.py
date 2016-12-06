@@ -15,9 +15,10 @@ def makeSubFile():
     testingTargets = np.load("datasets/test_data.npy")
     print "Read in testing information"
 
-    f=open("datasets/mySubmit", "w+")
+    f=open("datasets/mySubmit_voting1.csv", "w+")
+    f.write("user_id#merchant_id,prob\n")
     for i in range(len(testingTargets)):
-        f.write("%s#%s, %s\n" %(testingTargets[i][0], testingTargets[i][1], results[i][1]))
+        f.write("%s#%s,%s\n" %(testingTargets[i][0], testingTargets[i][1], results[i][1]))
         i+= 1
     f.close()
 
@@ -76,9 +77,10 @@ def popResults():
     clf2 = RandomForestClassifier(random_state=1).fit(trainingData, trainingResults)
     clf3 = GaussianNB().fit(trainingData, trainingResults)
 
-    eclf = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='hard')
-    print clf1.predict_proba(testingData)
-    results = clf1.predict_proba(testingData)
+    eclf = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='soft', weights=[1, 1, 1])
+    eclf.fit(trainingData, trainingResults)
+    print eclf.predict_proba(testingData)
+    results = eclf.predict_proba(testingData)
     print clf1.predict(testingData)
 
 

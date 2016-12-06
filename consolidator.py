@@ -49,13 +49,30 @@ def readData():
     conUserInfo = np.load("datasets/UserInfo2.npy")
     print("Read in user information 2")
 
-def addIfMissing(array, value):
+def addIfMissing2(array, value):
     i = 0;
     try:
         i = array.index(value)
     except ValueError:
         array.append(value)
         i = array.index(value)
+    return i
+
+def addIfMissing3(array, value, type):
+    i = 0;
+    search = map(itemgetter(0), array);
+    try:
+        i = search.index(value)
+        array[i][type + 1] += 1
+
+        #print"\n\n\n HELLO!!! \n\n\n"
+
+    except ValueError:
+        array.append([value, 0 ,0, 0, 0])
+        search = map(itemgetter(0), array);
+        i = search.index(value)
+        array[i][type + 1] += 1
+    #print array[i]
     return i
 
 
@@ -79,7 +96,7 @@ def updateUserInfo(transaction):
         print errorNum
 
         f=open("error_log.txt", "a+")
-        f.write("Error updating for transaction# %d" %transNum)
+        f.write("Error updating for transaction# %d\n" %transNum)
         f.close()
         return
 
@@ -89,7 +106,7 @@ def updateUserInfo(transaction):
     #print "At index: ", index, "We found ", userInfo[index], " = ", transaction[0], " and wrote to ", conUserInfo[index]
     #print transaction
     #adding item_id to list
-    addIfMissing(conUserInfo[index][1], transaction[1])
+    addIfMissing3(conUserInfo[index][1], transaction[1], transaction[6])
 #    try:
 #        conUserInfo[index][1].append(transaction[1])
 #    except IndexError:
@@ -99,7 +116,7 @@ def updateUserInfo(transaction):
         #print "Balls", conUserInfo[index]
 
     #adding category_id to list
-    addIfMissing(conUserInfo[index][2], transaction[2])
+    addIfMissing3(conUserInfo[index][2], transaction[2], transaction[6])
 #    try:
 #        conUserInfo[index][2] = conUserInfo[index][2] + [transaction[2]]
 #    except IndexError:
@@ -107,14 +124,14 @@ def updateUserInfo(transaction):
  #       #print conUserInfo[index]
 #
  #   #add merchant_id to list
-    addIfMissing(conUserInfo[index][3], transaction[3])
+    addIfMissing3(conUserInfo[index][3], transaction[3], transaction[6])
   #  try:
    #     conUserInfo[index][3] = conUserInfo[index][3] + [transaction[3]]
     #except IndexError:
      #   conUserInfo[index].append([transaction[3]])
 #
     #add brand_id to list
-    addIfMissing(conUserInfo[index][4], transaction[4])
+    addIfMissing3(conUserInfo[index][4], transaction[4], transaction[6])
  #   try:
   #      conUserInfo[index][4].append(transaction[4])
    # except IndexError:
@@ -140,10 +157,10 @@ def updateMerchantInfo(transaction):
         conMerchantInfo[index].append([])
         conMerchantInfo[index][0].append(transaction[3])
 
-    addIfMissing(conMerchantInfo[index][1], transaction[1])
-    addIfMissing(conMerchantInfo[index][2], transaction[2])
-    addIfMissing(conMerchantInfo[index][3], transaction[3])
-    addIfMissing(conMerchantInfo[index][4], transaction[4])       
+    addIfMissing2(conMerchantInfo[index][1], transaction[1])
+    addIfMissing2(conMerchantInfo[index][2], transaction[2])
+    addIfMissing2(conMerchantInfo[index][3], transaction[3])
+    addIfMissing2(conMerchantInfo[index][4], transaction[4])       
 
     merchantLookup = sorted(merchantLookup)
     conMerchantInfo = sorted(conMerchantInfo, key=itemgetter(0))

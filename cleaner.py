@@ -81,10 +81,10 @@ def processUserData():
     while i in range(len(userInfo)):
         emptyUserInfoTable.append([])
         emptyUserInfoTable[i].append(userInfo[i])
-        emptyUserInfoTable[i].append([])
-        emptyUserInfoTable[i].append([])
-        emptyUserInfoTable[i].append([])
-        emptyUserInfoTable[i].append([])
+        emptyUserInfoTable[i].append([[0, 0, 0, 0]])
+        emptyUserInfoTable[i].append([[0, 0, 0, 0]])
+        emptyUserInfoTable[i].append([[0, 0, 0, 0]])
+        emptyUserInfoTable[i].append([[0, 0, 0, 0]])
         i += 1
         if (i % 1000) == 0:
             printProgress(i, total, "User data table")
