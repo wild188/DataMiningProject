@@ -15,7 +15,7 @@ def makeSubFile():
     testingTargets = np.load("datasets/test_data.npy")
     print "Read in testing information"
 
-    f=open("datasets/mySubmit_voting1.csv", "w+")
+    f=open("datasets/mySubmit_all_logr.csv", "w+")
     f.write("user_id#merchant_id,prob\n")
     for i in range(len(testingTargets)):
         f.write("%s#%s,%s\n" %(testingTargets[i][0], testingTargets[i][1], results[i][1]))
@@ -78,19 +78,20 @@ def popResults():
     clf3 = GaussianNB().fit(trainingData, trainingResults)
 
     eclf = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='soft', weights=[1, 1, 1])
-    eclf.fit(trainingData, trainingResults)
-    print eclf.predict_proba(testingData)
-    results = eclf.predict_proba(testingData)
+    #eclf.fit(trainingData, trainingResults)
+    clf1.fit(trainingData, trainingResults)
+    print clf1.predict_proba(testingData)
+    results = clf1.predict_proba(testingData)
     print clf1.predict(testingData)
 
 
 results= []
 prepareData()
 print "Prepared all data"
-#testMod()
-#print "Tested"
+testMod()
+print "Tested"
 
-popResults()
-print "Calculated results"
-makeSubFile()
-print "Done"
+#popResults()
+#print "Calculated results"
+#makeSubFile()
+#print "Done"

@@ -4,6 +4,7 @@
 import csv
 import numpy as np
 import sys
+from operator import itemgetter
 
 def printProgress (iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
     """
@@ -78,9 +79,16 @@ def processUserData():
     emptyUserInfoTable = []
     total = len(userInfo)
     i = 0
-    while i in range(len(userInfo)):
+    userInfo = np.array(userInfo);
+    userInfo = np.delete(userInfo, (0), axis=0)
+    userInfo = np.array(userInfo, dtype= 'i8');
+    userInfo = userInfo.tolist();
+    #userInfo = userInfo.tolist();
+    sUserInfo = sorted(userInfo, key=itemgetter(0))
+    print sUserInfo
+    while i in range(len(sUserInfo)):
         emptyUserInfoTable.append([])
-        emptyUserInfoTable[i].append(userInfo[i])
+        emptyUserInfoTable[i].append(sUserInfo[i])
         emptyUserInfoTable[i].append([[0, 0, 0, 0]])
         emptyUserInfoTable[i].append([[0, 0, 0, 0]])
         emptyUserInfoTable[i].append([[0, 0, 0, 0]])

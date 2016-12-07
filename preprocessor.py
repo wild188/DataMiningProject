@@ -22,17 +22,26 @@ def findex(array, value):
 
 def lsearch(array, value):
     for i in range(len(array)):
-        if(array[i] == value):
+        if(array[i][0] == value):
             return i
     
     return -1
 
 def simScore(array1, array2):
-    score = 0;
-    for i in range(len(array1)):
+    score = [0, 0, 0, 0];
+    l1 = len(array1)
+    for i in range(l1):
         for j in range(len(array2)):
-            if array1[i] == array2[j]:
-                score += 1
+            if array1[i][0] == array2[j]:
+                score[0] += array1[i][1];
+                score[1] += array1[i][2];
+                score[2] += array1[i][3];
+                score[3] += array1[i][4];
+    #print score
+    score[0] = score[0] / l1
+    score[1] = score[1] / l1
+    score[2] = score[2] / l1
+    score[3] = score[3] / l1
     return score
 
 
@@ -55,6 +64,13 @@ def printProgress(iteration, total, prefix = '', suffix = '', decimals = 1, barL
     if iteration == total:
         sys.stdout.write('\n')
     sys.stdout.flush()
+
+def appendAll(target, master):
+    #print master
+    l = len(master)
+    for i in range(l):
+        target.append(master[i])
+        i += 1
 
 def readData():
     global trainingTargets
@@ -80,6 +96,7 @@ def genUserLookup():
     #print userLookup
     userLookup = map(itemgetter(0), userLookup)
     #print userLookup
+    #userLookup = map(itemgetter(0), userLookup)
 
 def genMerchantLookup():
     global merchantInfo
@@ -105,21 +122,29 @@ def tupleGen(user, merchant):
     
     itemScore = simScore(userInfo[userIndex][1], merchantInfo[merchantIndex][1])
     catScore = simScore(userInfo[userIndex][2], merchantInfo[merchantIndex][2])
-    merchantScore = lsearch(userInfo[userIndex][3], merchant)
-    if merchantScore == -1:
-        merchantScore = 0
-    else:
-        merchantScore = 1
+    merchantScore = simScore(userInfo[userIndex][3], merchantInfo[merchantIndex][3])#lsearch(userInfo[userIndex][3], merchant)
+    #if merchantScore == -1:
+     #   merchantScore = 0
+    #else:
+     #   merchantScore = 1
 
     brandScore = simScore(userInfo[userIndex][4], merchantInfo[merchantIndex][4])
 
     row.append(userInfo[userIndex][0][1]) #age
     row.append(userInfo[userIndex][0][2]) #gender
-    row.append(itemScore)
-    row.append(catScore)
-    row.append(merchantScore)
-    row.append(brandScore)
-    
+
+    #print itemScore
+    #row.append(itemScore[0], itemScore[1], itemScore[2], itemScore[3])
+    appendAll(row, itemScore)
+    appendAll(row, catScore)
+    appendAll(row, merchantScore)
+    appendAll(row, brandScore)
+
+    #row.append(itemScore[0], itemScore[1], itemScore[2], itemScore[3])
+    #row.append(catScore)
+    #row.append(merchantScore)
+    #row.append(brandScore)
+    #print row
     return row
 
 def genTrainingMatrix():
@@ -132,7 +157,7 @@ def genTrainingMatrix():
     for i in range(total):
         trainingData.append(tupleGen(trainingTargets[i][0], trainingTargets[i][1]))
         trainingData[i].append(trainingTargets[i][2])
-        if (i % 1000):
+        if (i % 1000) == 0:
             #print trainingData[i]
             printProgress(i, total, "Training data")
         i += 1
@@ -150,7 +175,7 @@ def genTestingMatrix():
             print "Testing matrix failed"
             return
         testingData.append(toAdd)
-        if (i % 1000):
+        if (i % 1000) == 0:
             #print testingData[i]
             printProgress(i, total, "Testing data")
         i += 1

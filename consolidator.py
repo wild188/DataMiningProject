@@ -41,7 +41,7 @@ def readData():
     global conUserInfo
 
     userInfo = np.load("datasets/userLog.npy")
-    userInfo = np.delete(userInfo, (0), axis=0)
+    #userInfo = np.delete(userInfo, (0), axis=0)
     print("Read in user information")
     purchaseInfo = np.load("datasets/purchase_info.npy")
     purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
@@ -88,7 +88,7 @@ def updateUserInfo(transaction):
     #index = np.searchsorted(userInfo[:,0], transaction[0])
     transaction = np.array(transaction, dtype='i8')
     index = findex(userLookup, transaction[0])
-    if index < 0:
+    if index < 0 or conUserInfo[index][0][0] != userLookup[index]:
         print "At index: ", index, "We Did not find ", userInfo[index], " = ", transaction[0], " and wrote to ", conUserInfo[index]
         print transaction
         print "ERROR!!!"
@@ -99,6 +99,8 @@ def updateUserInfo(transaction):
         f.write("Error updating for transaction# %d\n" %transNum)
         f.close()
         return
+
+    #print conUserInfo[index][0][0], " = ", userLookup[index], " = ", transaction[0]; 
 
     #print "Found user: ", transaction[0],"=", conUserInfo[index][0][0], " at index: ", index
 
@@ -221,7 +223,6 @@ print userInfo
 print userInfo[1]
 userInfo = userInfo.tolist()
 print userInfo[0]
-
 #billy = np.array([])
 #billy = np.hstack((userInfo[:1], userInfo[1:2], userInfo[2:]))
 #print billy
