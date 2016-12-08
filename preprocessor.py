@@ -28,20 +28,24 @@ def lsearch(array, value):
     return -1
 
 def simScore(array1, array2):
-    score = [0, 0, 0, 0];
+    score = [0.0, 0.0, 0.0, 0.0];
+    total = 0
     l1 = len(array1)
     for i in range(l1):
         for j in range(len(array2)):
             if array1[i][0] == array2[j]:
+                
                 score[0] += array1[i][1];
                 score[1] += array1[i][2];
                 score[2] += array1[i][3];
                 score[3] += array1[i][4];
+    #total += array1[i][1] + array1[i][2] + array1[i][3] + array1[i][4] 
     #print score
-    score[0] = score[0] / l1
-    score[1] = score[1] / l1
-    score[2] = score[2] / l1
-    score[3] = score[3] / l1
+    #score[0] = score[0] / total
+    #score[1] = score[1] / total
+    #score[2] = score[2] / total
+    #score[3] = score[3] / total
+    #score[4] = total
     return score
 
 
@@ -79,14 +83,18 @@ def readData():
     global merchantInfo
 
     trainingTargets = np.load("datasets/train_results.npy")
+    #trainingTargets = np.array(trainingTargets, dtype= 'f8')
     #userInfo = np.delete(userInfo, (0), axis=0)
     print "Read in training information"
     testingTargets = np.load("datasets/test_data.npy")
+    #testingTargets = np.array(testingTargets, dtype = 'f8')
     #purchaseInfo = np.delete(purchaseInfo, (0), axis=0)
     print "Read in testing information"
     userInfo = np.load("datasets/consUserInfo.npy")
+    #userInfo = np.array(userInfo, dtype = 'f8')
     print "Read in user information"
     merchantInfo = np.load("datasets/consMerchInfo.npy")
+    #merchantInfo = np.array(merchantInfo, dtype = 'f8')
     print "Read in merchant information"
 
 def genUserLookup():
@@ -130,8 +138,18 @@ def tupleGen(user, merchant):
 
     brandScore = simScore(userInfo[userIndex][4], merchantInfo[merchantIndex][4])
 
-    row.append(userInfo[userIndex][0][1]) #age
-    row.append(userInfo[userIndex][0][2]) #gender
+    #age
+    if(userInfo[userIndex][0][1] == 7):
+        row.append(3.754003478) #average known age
+    else:
+         row.append(userInfo[userIndex][0][1])
+    #row.append(userInfo[userIndex][0][1]) #age
+
+    #gender
+    if(userInfo[userIndex][0][2] == 2):
+        row.append(0.5)
+    else:
+         row.append(userInfo[userIndex][0][2])
 
     #print itemScore
     #row.append(itemScore[0], itemScore[1], itemScore[2], itemScore[3])
@@ -197,20 +215,20 @@ def saveData():
     trainingData = np.array(trainingData)
     testingData = np.array(testingData)
 
-    with open("datasets/trainingData.npy", 'w') as f:
+    with open("datasets/trainingData_abs.npy", 'w') as f:
     	np.save(f, trainingData);
         print("Saved training data")
     
-    with open("datasets/testingData.npy", 'w') as f:
+    with open("datasets/testingData_abs.npy", 'w') as f:
     	np.save(f, testingData);
         print("Saved testing data")
 
 
-trainingTargets = np.array(trainingTargets, dtype='i8')
+trainingTargets = np.array(trainingTargets, dtype='f8')
 print "Made training numbers"
 print trainingTargets
 #testingTargets = np.delete(testingTargets, (0), axis=0)
-testingTargets = np.array(testingTargets, dtype='i8')
+testingTargets = np.array(testingTargets, dtype='f8')
 print "Made testing numbers"
 print testingTargets
 #trainingTargets = trainingTargets.tolist()
